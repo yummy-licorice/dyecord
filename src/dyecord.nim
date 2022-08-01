@@ -12,6 +12,7 @@ import ../lib/[funcs, palettes]
 var token: string
 var prefix: string
 var imgurID: string
+var inviteLink = "https://discord.com/api/oauth2/authorize?client_id=1003151360012853288&permissions=8&scope=applications.commands%20bot"
 
 try:
   load()
@@ -91,6 +92,18 @@ cmd.addChat("convert") do (url: string, colors: seq[string]):
             )]
         )
         return
+
+cmd.addChat("invite") do ():
+  discard await discord.api.sendMessage(
+    msg.channelID,
+    embeds = @[Embed(
+        title: some "Invite me!",
+        description: some fmt"""[Click here]({inviteLink}) 
+
+Or copy this link: {inviteLink}""",
+        color: some 0x36393f
+    )]
+  )
 
 # Start the bot
 waitFor discord.startSession()

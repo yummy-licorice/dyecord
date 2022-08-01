@@ -2,10 +2,8 @@ FROM nimlang/nim:latest
 
 WORKDIR /dyecord
 
-COPY dyecord.nimble ./ 
+COPY . .  
 
 RUN nimble i
-
-COPY . .
 
 CMD [ "./dyecord" ]

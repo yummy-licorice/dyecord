@@ -6,7 +6,7 @@ import dotenv,
        options,
        osproc
 
-import ../lib/funcs
+import ../lib/[funcs, palettes]
 
 # Read the secrets file
 var token: string
@@ -57,7 +57,12 @@ cmd.addChat("convert") do (url: string, colors: seq[string]):
         echo "Downloaded {filename}"
         var file = filename
         var convName = "conv-" & filename.splitFile().name & ".png"
-        col(file, false, colors)
+        var col = colors
+        if colors.len == 1:
+          for k, v in pal.fieldPairs:
+            if k == colors[1]:
+              col = v
+        col(file, false, col)
         removeFile(imageDir / filename)
         echo "File removed"
         let convUrl = execCmdEx(fmt"curl -s --location --request POST 'https://api.imgur.com/3/image' --header 'Authorization: Client-ID {imgurID}' --form 'image=@{convName}' | jq .data.link")[0].replace("\"", "")

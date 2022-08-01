@@ -111,7 +111,7 @@ Or copy this link: {inviteLink}""",
 cmd.addChat("eval") do (code: seq[string]):
   if msg.author.id == ownerID:
     try:
-      var command = code.join(" ").replace(";", "\n")
+      var command = code.join(" ")#.replace(";", "\n")
       var result = execCmdEx("nim --eval:'$#' --verbosity:0" % [command])[0].strip()
       discard await discord.api.sendMessage(
         msg.channelID,

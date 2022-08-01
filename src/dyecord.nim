@@ -53,14 +53,14 @@ cmd.addChat("convert") do (url: string, colors: seq[string]):
     try:
         var filename = url.split("/")[url.split("/").len - 1]
         var imageDir = getCurrentDir() / "images"
-        discard execShellCmd(fmt"curl -o {imageDir}/{filename} {url}")
+        discard execShellCmd(fmt"curl -O {url}")
         echo "Downloaded {filename}"
-        var file = imageDir / filename
+        var file = filename
         var convName = "conv-" & filename.splitFile().name & ".png"
         col(file, false, colors)
         removeFile(imageDir / filename)
         echo "File removed"
-        let convUrl = execCmdEx(fmt"curl -s --location --request POST 'https://api.imgur.com/3/image' --header 'Authorization: Client-ID {imgurID}' --form 'image=@{convName}' | tac | tac | jq .data.link")[0].replace("\"", "")
+        let convUrl = execCmdEx(fmt"curl -s --location --request POST 'https://api.imgur.com/3/image' --header 'Authorization: Client-ID {imgurID}' --form 'image=@{convName}' | jq .data.link")[0].replace("\"", "")
         discard await discord.api.sendMessage(
             msg.channelID,
             embeds = @[Embed(

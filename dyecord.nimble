@@ -14,7 +14,6 @@ requires "nim >= 1.4.8"
 requires "pixie"
 requires "https://github.com/Infinitybeond1/dimscord#head"
 requires "https://github.com/Infinitybeond1/dimscmd#head"
-requires "parsetoml"
 requires "dotenv#head"
 
 task b, "Build the bot":

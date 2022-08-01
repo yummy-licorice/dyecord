@@ -53,7 +53,7 @@ cmd.addChat("convert") do (url: string, colors: seq[string]):
     try:
         var filename = url.split("/")[url.split("/").len - 1]
         var imageDir = getCurrentDir() / "images"
-        discard execShellCmd(fmt"wget {url} -O {imageDir}/{filename}")
+        discard execShellCmd(fmt"curl -o {imageDir}/{filename} {url}")
         echo "Downloaded {filename}"
         var file = imageDir / filename
         var convName = "conv-" & filename.splitFile().name & ".png"

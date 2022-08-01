@@ -60,7 +60,7 @@ cmd.addChat("convert") do (url: string, colors: seq[string]):
         var col = colors
         if colors.len == 1:
           for k, v in pal.fieldPairs:
-            if k == colors[1]:
+            if k == colors[0]:
               col = v
         col(file, false, col)
         removeFile(imageDir / filename)

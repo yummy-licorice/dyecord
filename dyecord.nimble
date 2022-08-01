@@ -20,5 +20,8 @@ requires "dotenv#head"
 task b, "Build the bot":
   exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl"
 
+task i, "Install and build bot":
+  exec "nimble install -d -y && nimble build -d:release -d:dimscordDebug --verbose -d:ssl"
+
 task r, "Run the bot":
   exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl && ./dyecord"

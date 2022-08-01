@@ -4,7 +4,7 @@ WORKDIR /dyecord
 
 COPY dyecord.nimble ./ 
 
-RUN nimble install -d -y && nimble build -d:ssl -d:release -d:dimscordDebug
+RUN nimble i
 
 COPY . .
 

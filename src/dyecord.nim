@@ -11,14 +11,17 @@ import ../lib/funcs
 # Read the secrets file
 var token: string
 var prefix: string
+var imgurID: string
 
 try:
   load()
   token = getenv("TOKEN")
   prefix = getenv("BOT_PREFIX")
+  imgurID = getenv("IMGUR_ID")
 except:
   token = getenv("TOKEN")
   prefix = getenv("BOT_PREFIX")
+  imgurID = getenv("IMGUR_ID")
 
 # Dimscord setup
 let discord = newDiscordClient(token)
@@ -57,7 +60,7 @@ cmd.addChat("convert") do (url: string, colors: seq[string]):
         col(file, false, colors)
         removeFile(imageDir / filename)
         echo "File removed"
-        let convUrl = execCmdEx(fmt"curl -s -F'file=@{convName}' https://0x0.st")[0]
+        let convUrl = execCmdEx(fmt"curl -s --location --request POST 'https://api.imgur.com/3/image' --header 'Authorization: Client-ID {imgurID}' --form 'image=@{convName}' | jq .data.link")[0].replace("\"", "")
         discard await discord.api.sendMessage(
             msg.channelID,
             embeds = @[Embed(

@@ -4,7 +4,7 @@ WORKDIR /dyecord
 
 COPY . .  
 
-RUN apt --yes update && apt --yes install curl
+RUN apt --yes update && apt --yes install curl jq
 RUN nimble i
 
 CMD [ "./dyecord" ]

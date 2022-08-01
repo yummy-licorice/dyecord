@@ -9,9 +9,16 @@ import dotenv,
 import ../lib/funcs
 
 # Read the secrets file
-load()
-let token = getenv("TOKEN")
-let prefix = getenv("BOT_PREFIX")
+var token: string
+var prefix: string
+
+try:
+  load()
+  token = getenv("TOKEN")
+  prefix = getenv("BOT_PREFIX")
+except:
+  token = getenv("TOKEN")
+  prefix = getenv("BOT_PREFIX")
 
 # Dimscord setup
 let discord = newDiscordClient(token)

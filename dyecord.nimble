@@ -15,6 +15,7 @@ requires "pixie"
 requires "https://github.com/Infinitybeond1/dimscord#head"
 requires "https://github.com/Infinitybeond1/dimscmd#head"
 requires "dotenv#head"
+requires "parsetoml"
 
 task b, "Build the bot":
   exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl"

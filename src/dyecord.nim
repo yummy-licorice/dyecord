@@ -4,25 +4,28 @@ import dotenv,
        dimscmd,
        asyncdispatch,
        options,
-       osproc
+       osproc,
+       parsetoml
 
 import ../lib/[funcs, palettes]
 
 # Read the secrets file
 var token: string
-var prefix: string
 var imgurID: string
-var inviteLink = "https://discord.com/api/oauth2/authorize?client_id=1003151360012853288&permissions=8&scope=applications.commands%20bot"
 
 try:
   load()
   token = getenv("TOKEN")
-  prefix = getenv("BOT_PREFIX")
   imgurID = getenv("IMGUR_ID")
 except:
   token = getenv("TOKEN")
-  prefix = getenv("BOT_PREFIX")
   imgurID = getenv("IMGUR_ID")
+
+# Parse the config file
+var parsed = parsetoml.parseFile(getCurrentDir() / "config.toml")
+var prefix = $(parsed["Config"]["prefix"])
+var inviteLink = $(parsed["Config"]["invite_url"])
+var ownerID = $(parsed["Config"]["owner_id"])
 
 # Dimscord setup
 let discord = newDiscordClient(token)
@@ -104,6 +107,39 @@ Or copy this link: {inviteLink}""",
         color: some 0x36393f
     )]
   )
+
+cmd.addChat("eval") do (code: seq[string]):
+  if msg.author.id == ownerID:
+    try:
+      var command = code.join(" ").replace(";", "\n")
+      var result = execCmdEx("nim --eval:'$#' --verbosity:0" % [command])[0].strip()
+      discard await discord.api.sendMessage(
+        msg.channelID,
+        embeds = @[Embed(
+            title: some "📝 Eval result",
+            description: some fmt"```{result}```",
+            color: some 0x36393f
+        )]
+      )
+    except:
+      discard await discord.api.sendMessage(
+        msg.channelID,
+        embeds = @[Embed(
+            title: some "Error",
+            description: some getCurrentExceptionMsg(),
+            color: some 0x36393f
+        )]
+      )
+  else:
+    discard await discord.api.sendMessage(
+      msg.channelID,
+      embeds = @[Embed(
+          title: some "Error",
+          description: some "Only the bot owner can use this command!",
+          color: some 0x36393f
+      )]
+    )
+
 
 # Start the bot
 waitFor discord.startSession()

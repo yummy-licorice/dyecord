@@ -16,6 +16,7 @@ requires "https://github.com/Infinitybeond1/dimscord#head"
 requires "https://github.com/Infinitybeond1/dimscmd#head"
 requires "dotenv#head"
 requires "parsetoml"
+requires "norm"
 
 task b, "Build the bot":
   exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl"
@@ -25,3 +26,6 @@ task i, "Install and build bot":
 
 task r, "Run the bot":
   exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl && ./dyecord"
+
+task z, "Build and run the bot with zig":
+  exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl --cc:clang --clang.exe:zigcc && ./dyecord"

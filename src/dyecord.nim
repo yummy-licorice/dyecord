@@ -5,7 +5,8 @@ import dotenv,
        asyncdispatch,
        options,
        osproc,
-       parsetoml
+       parsetoml,
+       norm/model
 
 import ../lib/[funcs, palettes]
 
@@ -26,6 +27,14 @@ var parsed = parsetoml.parseFile(getCurrentDir() / "config.toml")
 var prefix = $(parsed["Config"]["prefix"])
 var inviteLink = $(parsed["Config"]["invite_url"])
 var ownerID = $(parsed["Config"]["owner_id"])
+var guildID = $(parsed["Config"]["guild_id"])
+var localCommands = parsed["Switches"]["local_slash"].getBool()
+
+# Database stuff
+type
+  Config* = ref object of Model
+    prefix: seq[string]
+    channels: seq[string]
 
 # Dimscord setup
 let discord = newDiscordClient(token)
@@ -140,6 +149,24 @@ cmd.addChat("eval") do (code: seq[string]):
       )]
     )
 
+var defaultGuildID = ""
+
+if localCommands:
+  defaultGuildID = guildID
+
+cmd.addSlash("ping", guildID = defaultGuildID) do ():
+    ## Return bot ping
+    let response = InteractionResponse(
+        kind: irtChannelMessageWithSource,
+        data: some InteractionApplicationCommandCallbackData(
+          embeds: @[Embed(
+              title: some "🏓 Pong!",
+              description: some fmt"My ping is: {$s.latency}ms",
+              color: some 0x36393f
+          )]
+        )
+    )
+    await discord.api.createInteractionResponse(i.id, i.token, response)
 
 # Start the bot
 waitFor discord.startSession()

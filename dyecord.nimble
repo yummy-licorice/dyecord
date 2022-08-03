@@ -6,6 +6,7 @@ description = "Dye as a discord bot"
 license = "GPL-3.0-or-later"
 srcDir = "src"
 bin = @["dyecord"]
+binDir = "dist/"
 
 
 # Dependencies
@@ -28,7 +29,7 @@ task i, "Install and build bot":
   exec "nimble install -d -y && nimble build -d:release -d:dimscordDebug --verbose -d:ssl"
 
 task r, "Run the bot":
-  exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl && ./dyecord"
+  exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl && ./dist/dyecord"
 
 task z, "Build and run the bot with zig":
-  exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl --cc:clang --clang.exe:zigcc && ./dyecord"
+  exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl --cc:clang --clang.exe:zigcc && ./dist/dyecord"

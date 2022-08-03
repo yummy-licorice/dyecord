@@ -155,8 +155,8 @@ cmd.addSlash("invite", guildID = defaultGuildID) do ():
             title: some "Invite me!",
             description: some fmt"""[Click here]({inviteLink})""",
             color: some 0x36393f
-      )]
-    )
+    )]
+  )
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
 
@@ -222,6 +222,65 @@ GPU: {getGpuName()}```""",
   )
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
+
+cmd.addSlash("purge", guildID = defaultGuildID) do (messages: int):
+  ## Purge the given amount of messages
+  let userPerms = i.member.get().permissions
+  var canUse = false
+  for perm in userPerms:
+    if $perm == "Manage Messages":
+      canUse = true
+    #echo $perm
+  if not canUse:
+    let response = InteractionResponse(
+        kind: irtChannelMessageWithSource,
+        data: some InteractionApplicationCommandCallbackData(
+          embeds: @[Embed(
+              title: some "Error",
+              description: some "You don't have permission to use this command!",
+              color: some 0x36393f
+      )]
+    )
+    )
+    await discord.api.createInteractionResponse(i.id, i.token, response)
+  else:
+    try:
+      let msgs = await discord.api.getChannelMessages(i.channel_id.get,
+          limit = messages)
+      let response = InteractionResponse(
+          kind: irtChannelMessageWithSource,
+          data: some InteractionApplicationCommandCallbackData(
+            embeds: @[Embed(
+                title: some "🗑 Puring...",
+                description: some fmt"Purging {messages} messages",
+                color: some 0x36393f
+        )]
+      )
+      )
+      await discord.api.createInteractionResponse(i.id, i.token, response)
+      var m: seq[string]
+      for msg in msgs:
+        m.add(msg.id)
+      await discord.api.bulkDeleteMessages(i.channel_id.get, m)
+      discard await discord.api.editInteractionResponse(appID, i.token,
+          message_id = "@original", embeds = @[Embed(
+              title: some "🗑 Purged!",
+              description: some fmt"Purged {messages} messages",
+              color: some 0x36393f
+        )]
+      )
+    except:
+      let response = InteractionResponse(
+          kind: irtChannelMessageWithSource,
+          data: some InteractionApplicationCommandCallbackData(
+            embeds: @[Embed(
+                title: some "Error",
+                description: some getCurrentExceptionMsg(),
+                color: some 0x36393f
+        )]
+      )
+      )
+      await discord.api.createInteractionResponse(i.id, i.token, response)
 
 # Start the bot
 waitFor discord.startSession()

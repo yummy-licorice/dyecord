@@ -32,4 +32,4 @@ task r, "Run the bot":
   exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl && ./dist/dyecord"
 
 task z, "Build and run the bot with zig":
-  exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl --cc:clang --clang.exe:zigcc && ./dist/dyecord"
+  exec "nimble lint && nimble build -d:release -d:dimscordDebug --verbose -d:ssl --cc:clang --clang.exe:zigcc && ./dist/dyecord"

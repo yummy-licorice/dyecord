@@ -7,7 +7,8 @@ import dotenv,
        osproc,
        parsetoml,
        dimscord/restapi/requester,
-       json
+       json,
+       sysinfo
 
 import ../lib/[funcs, palettes]
 
@@ -199,6 +200,27 @@ cmd.addSlash("eval", guildID = defaultGuildID) do (code: string):
       )
       )
       await discord.api.createInteractionResponse(i.id, i.token, response)
+
+cmd.addSlash("stats", guildID = defaultGuildID) do ():
+  ## Return computer stats
+  let response = InteractionResponse(
+      kind: irtChannelMessageWithSource,
+      data: some InteractionApplicationCommandCallbackData(
+        embeds: @[Embed(
+            title: some "💻 Stats",
+            description: some fmt"""```OS: {getOsName()}
+Manufacturer: {getMachineManufacturer()}
+CPU: {getCpuName()}
+CPU Speed: {getCpuGhz()}
+CPU Cores: {getNumTotalCores()}
+CPU Manufacturer: {getCpuManufacturer()}
+HOST: {getMachineModel()}
+GPU: {getGpuName()}```""",
+            color: some 0x36393f
+    )]
+  )
+  )
+  await discord.api.createInteractionResponse(i.id, i.token, response)
 
 # Start the bot
 waitFor discord.startSession()

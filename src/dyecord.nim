@@ -153,7 +153,8 @@ cmd.addSlash("invite", guildID = defaultGuildID) do ():
       data: some InteractionApplicationCommandCallbackData(
         embeds: @[Embed(
             title: some "Invite me!",
-            description: some fmt"""[Click here]({inviteLink})"""
+            description: some fmt"""[Click here]({inviteLink})""",
+            color: some 0x36393f
       )]
     )
   )

@@ -12,11 +12,13 @@ bin = @["dyecord"]
 
 requires "nim >= 1.4.8"
 requires "pixie"
-requires "https://github.com/Infinitybeond1/dimscord#head"
+requires "dimscord#head"
 requires "https://github.com/Infinitybeond1/dimscmd#head"
 requires "dotenv#head"
 requires "parsetoml"
-requires "norm"
+
+task lint, "Lint all *.nim files":
+  exec "nimpretty --indent:2 */**.nim"
 
 task b, "Build the bot":
   exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl"

@@ -3,6 +3,7 @@ prefix = "!"
 invite_url = "https://discord.com/api/oauth2/authorize?client_id=1003151360012853288&permissions=8&scope=applications.commands%20bot"
 owner_id = "704106773660827690"
 guild_id = "901692268082249748"
+app_id = "1003151360012853288"
 
 [Switches]
 local_slash = true

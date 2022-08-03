@@ -25,13 +25,15 @@ except:
   imgurID = getenv("IMGUR_ID")
 
 # Parse the config file
-var parsed = parsetoml.parseFile(getCurrentDir() / "config.toml")
-var prefix = $(parsed["Config"]["prefix"])
-var inviteLink = $(parsed["Config"]["invite_url"])
-var ownerID = $(parsed["Config"]["owner_id"])
-var appID = $(parsed["Config"]["app_id"])
-var guildID = $(parsed["Config"]["guild_id"])
-var localCommands = parsed["Switches"]["local_slash"].getBool()
+var
+  parsed = parsetoml.parseFile(getCurrentDir() / "config.toml")
+  prefix = $(parsed["Config"]["prefix"])
+  inviteLink = $(parsed["Config"]["invite_url"])
+  ownerID = $(parsed["Config"]["owner_id"])
+  appID = $(parsed["Config"]["app_id"])
+  guildID = $(parsed["Config"]["guild_id"])
+  guildInvite = $(parsed["Config"]["server_invite"])
+  localCommands = parsed["Switches"]["local_slash"].getBool()
 
 # Dimscord setup
 let discord = newDiscordClient(token)
@@ -281,6 +283,20 @@ cmd.addSlash("purge", guildID = defaultGuildID) do (messages: int):
       )
       )
       await discord.api.createInteractionResponse(i.id, i.token, response)
+
+cmd.addSlash("server", guildID = defaultGuildID) do ():
+  ## Return the invite for the support server
+  let response = InteractionResponse(
+      kind: irtChannelMessageWithSource,
+      data: some InteractionApplicationCommandCallbackData(
+        embeds: @[Embed(
+            title: some "🌎 Server Invite",
+            description: some fmt"[Click here]({guildInvite}) to join the server",
+            color: some 0x36393f
+    )]
+  )
+  )
+  await discord.api.createInteractionResponse(i.id, i.token, response)
 
 # Start the bot
 waitFor discord.startSession()

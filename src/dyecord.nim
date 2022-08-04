@@ -8,7 +8,8 @@ import dotenv,
        parsetoml,
        dimscord/restapi/requester,
        json,
-       sysinfo
+       sysinfo,
+       asciiText
 
 import ../lib/[funcs, palettes]
 
@@ -79,8 +80,8 @@ cmd.addSlash("ping", guildID = defaultGuildID) do ():
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
 
-cmd.addSlash("convert", guildID = defaultGuildID) do (url: string,
-    palette: string):
+cmd.addSlash("convert", guildID = defaultGuildID) do (url {.help: "The url of the file to convert".}: string,
+    palette {.help: "The palette to convert to".}: string):
   ## Convert an image to a specific set of colors
   try:
     var filename = url.split("/")[url.split("/").len - 1]
@@ -162,7 +163,7 @@ cmd.addSlash("invite", guildID = defaultGuildID) do ():
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
 
-cmd.addSlash("eval", guildID = defaultGuildID) do (code: string):
+cmd.addSlash("eval", guildID = defaultGuildID) do (code {.help: "The code to evaluate".}: string):
   ## Evaluate some nim code (owner only)
   if i.member.get().user.id != ownerID:
     let response = InteractionResponse(
@@ -225,9 +226,11 @@ GPU: {getGpuName()}```""",
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
 
-cmd.addSlash("purge", guildID = defaultGuildID) do (messages: int):
+cmd.addSlash("purge", guildID = defaultGuildID) do (
+  messages {.help: "Number of messages to delete".}: Option[int]):
   ## Purge the given amount of messages
   let userPerms = i.member.get().permissions
+  let mc = messages.get(100)
   var canUse = false
   for perm in userPerms:
     if $perm == "Manage Messages":
@@ -248,13 +251,13 @@ cmd.addSlash("purge", guildID = defaultGuildID) do (messages: int):
   else:
     try:
       let msgs = await discord.api.getChannelMessages(i.channel_id.get,
-          limit = messages)
+          limit = mc)
       let response = InteractionResponse(
           kind: irtChannelMessageWithSource,
           data: some InteractionApplicationCommandCallbackData(
             embeds: @[Embed(
                 title: some "🗑 Puring...",
-                description: some fmt"Purging {messages} messages",
+                description: some fmt"Purging {mc} messages",
                 color: some 0x36393f
         )]
       )
@@ -267,7 +270,7 @@ cmd.addSlash("purge", guildID = defaultGuildID) do (messages: int):
       discard await discord.api.editInteractionResponse(appID, i.token,
           message_id = "@original", embeds = @[Embed(
               title: some "🗑 Purged!",
-              description: some fmt"Purged {messages} messages",
+              description: some fmt"Purged {mc} messages",
               color: some 0x36393f
         )]
       )
@@ -297,6 +300,7 @@ cmd.addSlash("server", guildID = defaultGuildID) do ():
   )
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
+
 
 # Start the bot
 waitFor discord.startSession()

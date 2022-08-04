@@ -18,6 +18,7 @@ requires "https://github.com/Infinitybeond1/dimscmd#head"
 requires "dotenv#head"
 requires "parsetoml"
 requires "sysinfo"
+requires "asciitext"
 
 task lint, "Lint all *.nim files":
   exec "nimpretty --indent:2 */**.nim"

@@ -35,18 +35,17 @@ var
   guildID = $(parsed["Config"]["guild_id"])
   guildInvite = $(parsed["Config"]["permissions"])
   localCommands = parsed["Switches"]["local_slash"].getBool()
+  status = $(parsed["Config"]["status"])
 
 # Dimscord setup
 let discord = newDiscordClient(token)
 var cmd = discord.newHandler() # Must be var
-var guilds: seq[string]
 
 proc onReady(s: Shard, r: Ready) {.event(discord).} =
   await s.updateStatus(activity = some ActivityStatus(
-      name: "with images",
+      name: status,
       kind: atPlaying
   ), status = "online")
-
   echo "Ready as " & $r.user
   let j = (waitFor discord.api.request(
          "GET",
@@ -331,6 +330,20 @@ cmd.addSlash("kill", guildID = defaultGuildID) do ():
     )
     await discord.api.createInteractionResponse(i.id, i.token, response)
     quit(0)
+
+cmd.addSlash("repo", guildID = defaultGuildID) do ():
+  ## Get bot source code repository
+  let response = InteractionResponse(
+    kind: irtChannelMessageWithSource,
+    data: some InteractionApplicationCommandCallbackData(
+      embeds: @[Embed(
+        title: some "🐙 Repo",
+        description: some "https://github.com/Infinitybeond1/dye",
+        color: some 0x36393f
+    )]
+  )
+  )
+  await discord.api.createInteractionResponse(i.id, i.token, response)
 
 # Start the bot
 waitFor discord.startSession()

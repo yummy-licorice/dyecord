@@ -143,17 +143,14 @@ cmd.addSlash("convert", guildID = defaultGuildID) do (url {.help: "The url of th
     removeFile getCurrentDir() / convName
     echo "File removed"
   except:
-    let response = InteractionResponse(
-        kind: irtChannelMessageWithSource,
-        data: some InteractionApplicationCommandCallbackData(
-          embeds: @[Embed(
-              title: some "Error",
-              description: some getCurrentExceptionMsg()
+    discard await discord.api.editInteractionResponse(appID, i.token,
+        message_id = "@original", embeds = @[
+        Embed(
+            title: some "Error",
+            description: some getCurrentExceptionMsg(),
+            color: some 0x36393f,
       )]
     )
-    )
-    await discord.api.createInteractionResponse(i.id, i.token, response)
-
 cmd.addSlash("invite", guildID = defaultGuildID) do ():
   ## Return bot invite link
   let response = InteractionResponse(

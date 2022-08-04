@@ -28,11 +28,12 @@ except:
 var
   parsed = parsetoml.parseFile(getCurrentDir() / "config.toml")
   prefix = $(parsed["Config"]["prefix"])
-  inviteLink = $(parsed["Config"]["invite_url"])
+  perms = $(parsed["Config"]["permissions"])
   ownerID = $(parsed["Config"]["owner_id"])
   appID = $(parsed["Config"]["app_id"])
+  inviteLink = fmt"https://discord.com/api/oauth2/authorize?client_id={appID}&permissions={perms}&scope=applications.commands%20bot"
   guildID = $(parsed["Config"]["guild_id"])
-  guildInvite = $(parsed["Config"]["server_invite"])
+  guildInvite = $(parsed["Config"]["permissions"])
   localCommands = parsed["Switches"]["local_slash"].getBool()
 
 # Dimscord setup

@@ -18,7 +18,7 @@ let pal* = (
       "E6676B", "A2E4B8", "e2d06a", "92bbed", "ecc6e8", "80ffff",
       "cfebec", "3d3e51", "FF7377", "AAF0C1", "eadd94", "bdd6f4",
       "f9ecf7", "b3ffff", "edf7f8"],
-  catpuccin: @["F5E0DC", "F2CDCD", "F5C2E7", "CBA6F7", "F38BA8", "EBA0AC",
+  catppuccin: @["F5E0DC", "F2CDCD", "F5C2E7", "CBA6F7", "F38BA8", "EBA0AC",
       "FAB387", "F9E2AF", "A6E3A1", "94E2D5", "89DCEB", "90C1FB",
       "74C7EC", "B4BEFE", "C6D0F5", "AEB7D9", "969DBC", "7E84A0",
       "666A83", "4E5167", "36374A", "1E1E2E", "12121C", "07070A"],

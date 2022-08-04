@@ -42,6 +42,11 @@ var cmd = discord.newHandler() # Must be var
 var guilds: seq[string]
 
 proc onReady(s: Shard, r: Ready) {.event(discord).} =
+  await s.updateStatus(activity = some ActivityStatus(
+      name: "with images",
+      kind: atPlaying
+  ), status = "online")
+
   echo "Ready as " & $r.user
   let j = (waitFor discord.api.request(
          "GET",

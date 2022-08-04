@@ -8,8 +8,7 @@ import dotenv,
        parsetoml,
        dimscord/restapi/requester,
        json,
-       sysinfo,
-       asciiText
+       sysinfo
 
 import ../lib/[funcs, palettes]
 
@@ -163,7 +162,8 @@ cmd.addSlash("invite", guildID = defaultGuildID) do ():
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
 
-cmd.addSlash("eval", guildID = defaultGuildID) do (code {.help: "The code to evaluate".}: string):
+cmd.addSlash("eval", guildID = defaultGuildID) do (
+  code {.help: "The code to evaluate".}: string):
   ## Evaluate some nim code (owner only)
   if i.member.get().user.id != ownerID:
     let response = InteractionResponse(
@@ -301,6 +301,33 @@ cmd.addSlash("server", guildID = defaultGuildID) do ():
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
 
+cmd.addSlash("kill", guildID = defaultGuildID) do ():
+  ## Kill the bot (owner only)
+  if i.member.get().user.id != ownerID:
+    let response = InteractionResponse(
+        kind: irtChannelMessageWithSource,
+        data: some InteractionApplicationCommandCallbackData(
+          embeds: @[Embed(
+              title: some "Error",
+              description: some "Only the bot owner can use this command!",
+              color: some 0x36393f
+      )]
+    )
+    )
+    await discord.api.createInteractionResponse(i.id, i.token, response)
+  else:
+    let response = InteractionResponse(
+        kind: irtChannelMessageWithSource,
+        data: some InteractionApplicationCommandCallbackData(
+          embeds: @[Embed(
+              title: some "💀 Killing...",
+              description: some "Killing the bot",
+              color: some 0x36393f
+      )]
+    )
+    )
+    await discord.api.createInteractionResponse(i.id, i.token, response)
+    quit(0)
 
 # Start the bot
 waitFor discord.startSession()

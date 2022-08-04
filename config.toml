@@ -7,4 +7,4 @@ app_id = "1003151360012853288"
 server_invite = "https://discord.gg/5T7nDZFGft"
 
 [Switches]
-local_slash = true
+local_slash = false

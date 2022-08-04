@@ -303,7 +303,8 @@ cmd.addSlash("server", guildID = defaultGuildID) do ():
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
 
-cmd.addSlash("kill", guildID = defaultGuildID) do ():
+cmd.addSlash("kill", guildID = defaultGuildID) do (
+  code {.help: "The exit code to quit with".}: Option[int]):
   ## Kill the bot (owner only)
   if i.member.get().user.id != ownerID:
     let response = InteractionResponse(
@@ -318,18 +319,31 @@ cmd.addSlash("kill", guildID = defaultGuildID) do ():
     )
     await discord.api.createInteractionResponse(i.id, i.token, response)
   else:
-    let response = InteractionResponse(
+    let c = code.get(0)
+    if c == 0 or c == 1:
+      let response = InteractionResponse(
+          kind: irtChannelMessageWithSource,
+          data: some InteractionApplicationCommandCallbackData(
+            embeds: @[Embed(
+                title: some "💀 Killing...",
+                description: some fmt"Bot killed with code {c}",
+                color: some 0x36393f
+        )]
+      )
+      )
+      await discord.api.createInteractionResponse(i.id, i.token, response)
+      quit(c)
+    else:
+      let response = InteractionResponse(
         kind: irtChannelMessageWithSource,
         data: some InteractionApplicationCommandCallbackData(
           embeds: @[Embed(
-              title: some "💀 Killing...",
-              description: some "Killing the bot",
-              color: some 0x36393f
-      )]
-    )
-    )
-    await discord.api.createInteractionResponse(i.id, i.token, response)
-    quit(0)
+            title: some "Error!",
+            description: some "The exit code must be a binary integer (0 or 1)",
+            color: some 0x36393f
+        )]
+      )
+      )
 
 cmd.addSlash("repo", guildID = defaultGuildID) do ():
   ## Get bot source code repository

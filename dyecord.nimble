@@ -21,7 +21,7 @@ requires "sysinfo"
 requires "asciitext"
 
 task lint, "Lint all *.nim files":
-  exec "nimpretty --indent:2 */**.nim"
+  exec "nimpretty --indent:2 */**.nim && rm -rvf *.png *.jpg *.jpeg"
 
 task b, "Build the bot":
   exec "nimble build -d:release -d:dimscordDebug --verbose -d:ssl"

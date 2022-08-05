@@ -12,54 +12,54 @@ proc parseColor(colors: seq[string]): seq[Color] =
     res.add(parseHex(color))
   res
 
-proc prepareClosestColor*(colors: seq[string]): seq[ColorLAB] =
-  for color in colors:
-    result.add parseHex(color).to(ColorLAB)
-
-proc getClosestColor*(colors: seq[ColorLAB], old: Color): Color =
-  var
-    minDiff = 255
-    minDiffColor: ColorLAB
-    oldLab = old.to(ColorLab)
-  for color in colors:
-    let diff = oldLab.distance(color).int
-    if minDiff > diff:
-      minDiff = diff
-      minDiffColor = color
-  minDiffColor.to(Color)
-
-# Mimic the go function
-#proc getClosestColor*(colors: seq[ColorRGB], old: Color): Color =
-#  var
-#    r: int
-#    g: int
-#    b: int
-#    r2: int
-#    g2: int
-#    b2: int
-#    oldcol: ColorRGB
-#    res: Color
-#    minDiff: float64 = 999.0 ^ 2
-#    distance: float64
+#proc prepareClosestColor*(colors: seq[string]): seq[ColorLAB] =
 #  for color in colors:
-#    r = color.r.int()
-#    g = color.g.int()
-#    b = color.b.int()
-#    oldcol = old.to(ColorRGB)
-#    r2 = oldcol.r.int()
-#    g2 = oldcol.g.int()
-#    b2 = oldcol.b.int()
-#    distance = ((r2 - r)^2 + (g2 - g)^2 + (b2 - b)^2).float64
-#    if minDiff > distance:
-#      minDiff = distance
-#      res = color.to(Color)
-#  res
+#    result.add parseHex(color).to(ColorLAB)
 #
-#proc prepareClosestColor*(colors: seq[string]): seq[ColorRGB] =
-#  var res: seq[ColorRGB] = @[]
+#proc getClosestColor*(colors: seq[ColorLAB], old: Color): Color =
+#  var
+#    minDiff = 255
+#    minDiffColor: ColorLAB
+#    oldLab = old.to(ColorLab)
 #  for color in colors:
-#    res.add(parseHex(color).to(ColorRGB))
-#  res
+#    let diff = oldLab.distance(color).int
+#    if minDiff > diff:
+#      minDiff = diff
+#      minDiffColor = color
+#  minDiffColor.to(Color)
+#
+# Mimic the go function
+proc getClosestColor*(colors: seq[ColorRGB], old: Color): Color =
+  var
+    r: int
+    g: int
+    b: int
+    r2: int
+    g2: int
+    b2: int
+    oldcol: ColorRGB
+    res: Color
+    minDiff: float64 = 999.0 ^ 2
+    distance: float64
+  for color in colors:
+    r = color.r.int()
+    g = color.g.int()
+    b = color.b.int()
+    oldcol = old.to(ColorRGB)
+    r2 = oldcol.r.int()
+    g2 = oldcol.g.int()
+    b2 = oldcol.b.int()
+    distance = ((r2 - r)^2 + (g2 - g)^2 + (b2 - b)^2).float64
+    if minDiff > distance:
+      minDiff = distance
+      res = color.to(Color)
+  res
+
+proc prepareClosestColor*(colors: seq[string]): seq[ColorRGB] =
+  var res: seq[ColorRGB] = @[]
+  for color in colors:
+    res.add(parseHex(color).to(ColorRGB))
+  res
 
 proc getFilename*(file: string): string =
   extractFilename(file).split(".")[0]

@@ -85,7 +85,7 @@ cmd.addSlash("ping", guildID = defaultGuildID) do ():
   await discord.api.createInteractionResponse(i.id, i.token, response)
 
 cmd.addSlash("convert", guildID = defaultGuildID) do (url {.help: "The url of the file to convert".}: string,
-    palette {.help: "The palette to convert to".}: string):
+    palette {.help: "The palette to convert to (list palettes by running /list)".}: string):
   ## Convert an image to a specific set of colors
   try:
     var filename = url.split("/")[url.split("/").len - 1]
@@ -209,12 +209,13 @@ cmd.addSlash("eval", guildID = defaultGuildID) do (
 
 cmd.addSlash("stats", guildID = defaultGuildID) do ():
   ## Return computer stats
-  let response = InteractionResponse(
-      kind: irtChannelMessageWithSource,
-      data: some InteractionApplicationCommandCallbackData(
-        embeds: @[Embed(
-            title: some "💻 Stats",
-            description: some fmt"""```OS: {getOsName()}
+  try:
+    let response = InteractionResponse(
+        kind: irtChannelMessageWithSource,
+        data: some InteractionApplicationCommandCallbackData(
+          embeds: @[Embed(
+              title: some "💻 Stats",
+              description: some fmt"""```OS: {getOsName()}
 Manufacturer: {getMachineManufacturer()}
 CPU: {getCpuName()}
 CPU Speed: {getCpuGhz()}
@@ -222,11 +223,23 @@ CPU Cores: {getNumTotalCores()}
 CPU Manufacturer: {getCpuManufacturer()}
 HOST: {getMachineModel()}
 GPU: {getGpuName()}```""",
-            color: some 0x36393f
-    )]
-  )
-  )
-  await discord.api.createInteractionResponse(i.id, i.token, response)
+              color: some 0x36393f
+      )]
+    )
+    )
+    await discord.api.createInteractionResponse(i.id, i.token, response)
+  except:
+    let response = InteractionResponse(
+      kind: irtChannelMessageWithSource,
+      data: some InteractionApplicationCommandCallbackData(
+        embeds: @[Embed(
+          title: some "Error!",
+          description: some "Could not get computer specs",
+          color: some 0x36393f
+      )]
+    )
+    )
+    await discord.api.createInteractionResponse(i.id, i.token, response)
 
 cmd.addSlash("purge", guildID = defaultGuildID) do (
   messages {.help: "Number of messages to delete".}: Option[int]):
@@ -358,6 +371,25 @@ cmd.addSlash("repo", guildID = defaultGuildID) do ():
   )
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
+
+cmd.addSlash("list", guildID = defaultGuildID) do ():
+  ## List the availible color palettes
+  var p: seq[string]
+  for k, v in pal.fieldPairs:
+    discard v
+    p.add(k)
+  let response = InteractionResponse(
+    kind: irtChannelMessageWithSource,
+    data: some InteractionApplicationCommandCallbackData(
+      embeds: @[Embed(
+        title: some "Palettes",
+        description: some p.join("\n"),
+        color: some 0x36393f
+    )]
+  )
+  )
+  await discord.api.createInteractionResponse(i.id, i.token, response)
+
 
 # Start the bot
 waitFor discord.startSession()

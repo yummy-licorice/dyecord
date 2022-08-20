@@ -1,4 +1,4 @@
-import terminal, chroma, pixie, colors
+import terminal, chroma, pixie, colors, dimscord, options, asyncdispatch, strformat
 include prelude
 
 var
@@ -10,6 +10,13 @@ proc fileName(file: string): void =
   flipName = "flip-" & splitFile(file).name & ".png"
   convName = "conv-" & splitFile(file).name & ".png"
   lumaName = "luma-" & splitFile(file).name & ".png"
+
+proc normalizeHex*(hex: string): string =
+  var h = hex.replace("#", "")
+  if h.len == 3:
+    return fmt"{h[0]}{h[0]}{h[1]}{h[1]}{h[2]}{h[2]}"
+  elif h.len == 6:
+    return h
 
 proc col*(imgPath: string, bar: bool, colors: seq[string]): void =
   stdout.styledWriteLine(fgYellow, "Converting: ", fgWhite, splitFile(

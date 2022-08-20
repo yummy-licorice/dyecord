@@ -60,6 +60,29 @@ proc messageCreate (s: Shard, msg: Message) {.event(discord).} =
     # You can also pass in a list of prefixes
     # discard await cmd.handleMessage(@["$$", "&"], s, msg)
 
+var dmsg = initTable[string, string]()
+
+proc messageDelete (s: Shard, m: Message, exists: bool) {.event(discord).} =
+  if not m.author.bot:
+    dmsg[get(m.guild_id)] = m.content & ":::" & m.author.username
+    echo dmsg[get(m.guild_id)]
+  else:
+    dmsg["bot"] = m.content & ":::" & m.author.username
+    echo dmsg["bot"]
+
+proc respEmbed(i: Interaction, title, description: string): void =
+  let response = InteractionResponse(
+      kind: irtChannelMessageWithSource,
+      data: some InteractionApplicationCommandCallbackData(
+        embeds: @[Embed(
+            title: some title,
+            description: some description,
+            color: some 0x36393f
+    )]
+  )
+  )
+  waitFor discord.api.createInteractionResponse(i.id, i.token, response)
+
 
 proc interactionCreate (s: Shard, i: Interaction) {.event(discord).} =
   discard await cmd.handleInteraction(s, i)
@@ -84,6 +107,36 @@ cmd.addSlash("ping", guildID = defaultGuildID) do ():
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
 
+cmd.addSlash("snipe", guildID = defaultGuildID) do ():
+  ## Snipe the last deleted message
+  try:
+    let sm = dmsg[i.guild_id.get()].split(":::")
+    let user = sm[1]
+    let msg = sm[0]
+
+    let response = InteractionResponse(
+        kind: irtChannelMessageWithSource,
+        data: some InteractionApplicationCommandCallbackData(
+          embeds: @[Embed(
+              title: some "Sniped!",
+              description: some "From: $#\nContent: $#" % [user, msg],
+              color: some 0x36393f
+      )]
+    )
+    )
+    await discord.api.createInteractionResponse(i.id, i.token, response)
+  except:
+    let response = InteractionResponse(
+        kind: irtChannelMessageWithSource,
+        data: some InteractionApplicationCommandCallbackData(
+          embeds: @[Embed(
+              title: some "Error!",
+              description: some "Could not find any recently deleted messages in this server!",
+              color: some 0x36393f
+      )]
+    )
+    )
+    await discord.api.createInteractionResponse(i.id, i.token, response)
 cmd.addSlash("convert", guildID = defaultGuildID) do (url {.help: "The url of the file to convert".}: string,
     palette {.help: "The palette to convert to (list palettes by running /list)".}: string):
   ## Convert an image to a specific set of colors
@@ -351,12 +404,13 @@ cmd.addSlash("kill", guildID = defaultGuildID) do (
         kind: irtChannelMessageWithSource,
         data: some InteractionApplicationCommandCallbackData(
           embeds: @[Embed(
-            title: some "Error!",
+            title: some "Error",
             description: some "The exit code must be a binary integer (0 or 1)",
             color: some 0x36393f
         )]
       )
       )
+      await discord.api.createInteractionResponse(i.id, i.token, response)
 
 cmd.addSlash("repo", guildID = defaultGuildID) do ():
   ## Get bot source code repository
@@ -365,7 +419,7 @@ cmd.addSlash("repo", guildID = defaultGuildID) do ():
     data: some InteractionApplicationCommandCallbackData(
       embeds: @[Embed(
         title: some "🐙 Repo",
-        description: some "https://github.com/Infinitybeond1/dye",
+        description: some "https://github.com/Infinitybeond1/dyecord",
         color: some 0x36393f
     )]
   )
@@ -390,6 +444,78 @@ cmd.addSlash("list", guildID = defaultGuildID) do ():
   )
   await discord.api.createInteractionResponse(i.id, i.token, response)
 
+cmd.addSlash("kick", guildID = defaultGuildID) do (
+  user {.help: "The user to kick".}: User,
+    reason {.help: "The reason you are kicking the user".}: Option[string]):
+  ## Kick a member from your server
+  var canUse = false
+  for perm in i.member.get().permissions:
+    if $perm == "Kick Members":
+      canUse = true
+    echo $perm
+  if not canUse:
+    let response = InteractionResponse(
+        kind: irtChannelMessageWithSource,
+        data: some InteractionApplicationCommandCallbackData(
+          embeds: @[Embed(
+              title: some "Error",
+              description: some "You don't have permission to use this command!",
+              color: some 0x36393f
+      )]
+    )
+    )
+  let r = reason.get("No reason provided")
+  let guild = await discord.api.getGuild i.guild_id.get()
+  try:
+    let dm = (await discord.api.createUserDm(user.id))
+    discard await discord.api.sendMessage(dm.id, embeds = @[Embed(
+      title: some fmt"You have been kicked from {guild.name}",
+      description: some fmt"You were kicked from {guild.name}\nReason: {r}",
+      color: some 0x36393f
+    )])
+  finally:
+    await discord.api.removeGuildMember(i.guild_id.get(), user.id, reason = r)
+    let response = InteractionResponse(
+        kind: irtChannelMessageWithSource,
+        data: some InteractionApplicationCommandCallbackData(
+          embeds: @[Embed(
+              title: some "Error",
+              description: some getCurrentExceptionMsg(),
+              color: some 0x36393f
+      )]
+    )
+    )
+    await discord.api.createInteractionResponse(i.id, i.token, response)
+#    let response = InteractionResponse(
+#      kind: irtChannelMessageWithSource,
+#      data: some InteractionApplicationCommandCallbackData(
+#        embeds: @[Embed(
+#          title: some "Kicked!",
+#          description: some fmt"User {user.username} was kicked for {r}",
+#          color: some 0x36393f
+#      )]
+#    )
+#    )
+#    await discord.api.createInteractionResponse(i.id, i.token, response)
 
 # Start the bot
+#
+
+cmd.addSlash("clear_snipes", guildID = defaultGuildID) do ():
+  ## Clear the snipe database (owner only)
+  if i.member.get().user.id != ownerID:
+    let response = InteractionResponse(
+        kind: irtChannelMessageWithSource,
+        data: some InteractionApplicationCommandCallbackData(
+          embeds: @[Embed(
+              title: some "Error",
+              description: some "Only the bot owner can use this command!",
+              color: some 0x36393f
+      )]
+    )
+    )
+    await discord.api.createInteractionResponse(i.id, i.token, response)
+  else:
+    dmsg = initTable[string, string]()
+    i.respEmbed("Cleared!", "Cleared the sniped messages database")
 waitFor discord.startSession()

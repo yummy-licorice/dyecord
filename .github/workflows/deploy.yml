@@ -5,7 +5,7 @@ on:
 #set environment variables 
 env:
   HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  APP_NAME: ${{ 'dyecord' }}
+  APP_NAME: ${{ 'dyecord2' }}
 
 jobs:
       

@@ -519,6 +519,4 @@ cmd.addSlash("clear_snipes", guildID = defaultGuildID) do ():
     dmsg = initTable[string, string]()
     i.respEmbed("Cleared!", "Cleared the sniped messages database")
 
-include lib
-
 waitFor discord.startSession()

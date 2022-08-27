@@ -12,6 +12,15 @@ import dotenv,
 
 import ../lib/[funcs, palettes]
 
+type pe = enum
+  decay
+  darkdecay
+  decayce
+  articblush
+  catppuccin
+  ok
+  nord
+
 # Read the secrets file
 var token: string
 var imgurID: string
@@ -138,7 +147,7 @@ cmd.addSlash("snipe", guildID = defaultGuildID) do ():
     )
     await discord.api.createInteractionResponse(i.id, i.token, response)
 cmd.addSlash("convert", guildID = defaultGuildID) do (url {.help: "The url of the file to convert".}: string,
-    palette {.help: "The palette to convert to (list palettes by running /list)".}: string):
+    palette {.help: "The palette to convert to (list palettes by running /list)".}: pe):
   ## Convert an image to a specific set of colors
   try:
     var filename = url.split("/")[url.split("/").len - 1]
@@ -164,7 +173,7 @@ cmd.addSlash("convert", guildID = defaultGuildID) do (url {.help: "The url of th
     var convName = "conv-" & filename.splitFile().name & ".png"
     var col: seq[string]
     for k, v in pal.fieldPairs:
-      if k == palette:
+      if k == $palette:
         col = v
     if col.len == 0:
       let response = InteractionResponse(
